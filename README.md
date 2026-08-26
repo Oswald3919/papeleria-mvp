@@ -4,7 +4,11 @@ Una demostración estática, sin APIs ni servicios externos. Tiene catálogo, im
 
 ## Administración e inventario
 
-Abre `admin.html` para probar el panel local: ajustes rápidos de existencia, stock bajo e importación desde CSV o Excel. **Importar productos** crea los artículos nuevos y actualiza coincidencias por SKU o código; **Actualizar existencias** sólo cambia el stock de artículos ya cargados. El botón **Resetear inventario** vacía el catálogo después de pedir confirmación.
+Abre `admin.html` para gestionar el inventario compartido: ajustes rápidos de existencia, stock bajo e importación desde CSV o Excel. **Importar productos** crea los artículos nuevos y actualiza coincidencias por SKU; **Actualizar existencias** sólo cambia el stock de artículos ya cargados. El botón **Resetear inventario** vacía la base de datos después de pedir confirmación.
+
+## Inventario compartido (Supabase)
+
+Ejecuta primero `supabase/schema.sql` en el SQL Editor de Supabase. Crea el usuario administrador en **Authentication > Users**, y después ejecuta `supabase/enable-shared-inventory.sql` tras reemplazar el correo de ejemplo. Desde ese momento, entra al panel con esa cuenta e importa el CSV: los productos, cambios de stock y reseteos se guardarán en Supabase y el catálogo público se actualizará igual en todos los dispositivos.
 
 ## Usarlo
 
