@@ -31,13 +31,23 @@
               try{
                 const supa = window.supabase.createClient(cfg.url, cfg.publishableKey);
                 console.log('admin-extras: subiendo', products.length, 'productos a Supabase...');
-                // Upsert rows (requiere que la tabla 'products' exista y acepte estos campos)
-                const {data:upData, error:upErr} = await supa.from('products').upsert(products);
-                if(upErr) throw upErr;
-                console.log('admin-extras: upsert OK', upData?.length);
-                // Refrescar catálogo local desde Supabase
-                const {data:all, error:selErr} = await supa.from('products').select('*');
-                if(selErr) throw selErr;
+                // Upsert rows in batches of 500
+                for (let i = 0; i < products.length; i += 500) {
+                  const chunk = products.slice(i, i + 500);
+                  const {error: upErr} = await supa.from('products').upsert(chunk);
+                  if(upErr) throw upErr;
+                }
+                // Refrescar catálogo local desde Supabase con paginación
+                let all = [];
+                let page = 0;
+                while (true) {
+                  const {data: pageData, error: selErr} = await supa.from('products').select('*').range(page * 1000, (page + 1) * 1000 - 1);
+                  if(selErr) throw selErr;
+                  if(!pageData || !pageData.length) break;
+                  all.push(...pageData);
+                  if(pageData.length < 1000) break;
+                  page++;
+                }
                 const s = initial(); s.products = (all||[]).map(p=>({id:String(p.id),name:p.name,sku:p.sku,stock:Number(p.stock)||0,minimum_stock:Number(p.minimum_stock)||0}));
                 save(s);
                 const note = document.getElementById('importNote'); if(note) note.textContent = `Importación a Supabase terminada: ${s.products.length} productos desde ${f.name}.`;

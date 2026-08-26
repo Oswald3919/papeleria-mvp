@@ -10,11 +10,30 @@
     byId('lastUpdate').textContent = 'Última actualización: ' + new Date().toLocaleString('es-MX');
   };
   const databaseProduct = p => ({ sku: p.sku || null, name: p.name, category: p.category || null, price: Number(p.price) || 0, stock: Math.max(0, Number(p.stock) || 0), minimum_stock: Math.max(0, Number(p.minimum_stock) || 0), image_url: p.image || null, is_active: true });
+  async function batchUpload(table, items, onConflict) {
+    const chunkSize = 500;
+    for (let i = 0; i < items.length; i += chunkSize) {
+      const chunk = items.slice(i, i + chunkSize);
+      const res = onConflict
+        ? await db.from(table).upsert(chunk, { onConflict })
+        : await db.from(table).insert(chunk);
+      if (res.error) throw res.error;
+    }
+  }
   async function pull() {
-    const result = await db.from('products').select('id,sku,barcode,name,category,price,stock,minimum_stock,image_url').order('name');
-    if (result.error) throw result.error;
+    let allData = [];
+    let page = 0;
+    const pageSize = 1000;
+    while (true) {
+      const result = await db.from('products').select('id,sku,barcode,name,category,price,stock,minimum_stock,image_url').order('name').range(page * pageSize, (page + 1) * pageSize - 1);
+      if (result.error) throw result.error;
+      if (!result.data || !result.data.length) break;
+      allData.push(...result.data);
+      if (result.data.length < pageSize) break;
+      page++;
+    }
     const current = state();
-    current.products = (result.data || []).map(p => ({ ...p, id: String(p.id), price: Number(p.price) || 0, stock: Number(p.stock) || 0, minimum_stock: Number(p.minimum_stock) || 0, image: p.image_url || '' }));
+    current.products = allData.map(p => ({ ...p, id: String(p.id), price: Number(p.price) || 0, stock: Number(p.stock) || 0, minimum_stock: Number(p.minimum_stock) || 0, image: p.image_url || '' }));
     current.cart = (current.cart || []).filter(item => current.products.some(p => p.id === item.id));
     saveState(current); render(); return current;
   }
@@ -41,12 +60,13 @@
   byId('productsFile').onchange = async event => {
     const file = event.target.files[0]; if (!file) return;
     try {
+      say('Procesando e importando productos en lotes…');
       const products = (await readRows(file)).map(rowToProduct).filter(Boolean);
       if (!products.length) throw Error('No se encontró ninguna fila con Nombre o Producto.');
       const withSku = products.filter(p => p.sku).map(databaseProduct);
       const withoutSku = products.filter(p => !p.sku).map(databaseProduct);
-      if (withSku.length) { const result = await db.from('products').upsert(withSku, { onConflict: 'sku' }); if (result.error) throw result.error; }
-      if (withoutSku.length) { const result = await db.from('products').insert(withoutSku); if (result.error) throw result.error; }
+      if (withSku.length) await batchUpload('products', withSku, 'sku');
+      if (withoutSku.length) await batchUpload('products', withoutSku);
       await pull(); say(products.length + ' producto(s) guardado(s) en la base de datos desde ' + file.name + '.');
     } catch (error) { say('No se pudo importar: ' + error.message, true); }
     event.target.value = '';
