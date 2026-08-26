@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cybertime</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#inicio">Cybertime <span>• pedidos para recoger</span></a>
+    <nav>
+      <a href="#catalogo">Catálogo</a>
+      <button class="text-button" id="accountButton">Mi cuenta</button>
+      <button class="cart-button" id="cartButton">Carrito <b id="cartCount">0</b></button>
+    </nav>
+  </header>
+
+  <main id="inicio">
+    <section class="hero">
+      <p class="eyebrow">Papelería local</p>
+      <h1>Haz tu pedido y recógelo en tienda.</h1>
+      <p>Compra en línea, paga en efectivo cuando pases por tu pedido y acumula puntos con cada compra.</p>
+      <a class="primary-button" href="#catalogo">Ver productos</a>
+    </section>
+
+    <section class="notice" id="userStatus">Inicia sesión para acumular puntos y consultar tus pedidos.</section>
+
+    <section class="catalog-section" id="catalogo">
+      <div class="section-heading">
+        <div><p class="eyebrow">Productos</p><h2>Catálogo</h2></div>
+        <input id="searchInput" type="search" placeholder="Buscar producto" aria-label="Buscar producto" />
+      </div>
+      <div class="filters" id="categoryFilters"></div>
+      <div class="product-grid" id="productGrid"></div>
+    </section>
+
+    <section class="management" id="gestion" hidden>
+      <p class="eyebrow">Sólo demostración</p>
+      <h2>Gestión del catálogo</h2>
+      <p>Importa un CSV de WooCommerce o un CSV sencillo. Los productos quedan guardados en este navegador.</p>
+      <div class="management-actions">
+        <label class="secondary-button" for="csvInput">Importar archivo CSV</label>
+        <input id="csvInput" type="file" accept=".csv,text/csv" hidden />
+        <button class="secondary-button" id="restoreButton">Restaurar catálogo de muestra</button>
+      </div>
+      <p class="hint" id="importResult">El archivo que compartiste usa columnas compatibles: Nombre, Precio normal, Inventario, Categorías e Imágenes.</p>
+    </section>
+  </main>
+
+  <aside class="side-panel" id="cartPanel" aria-hidden="true">
+    <div class="panel-heading"><h2>Tu carrito</h2><button class="close-button" data-close="cartPanel">×</button></div>
+    <div id="cartItems"></div>
+    <div class="cart-total">Total <strong id="cartTotal">$0.00</strong></div>
+    <button class="primary-button full" id="checkoutButton">Continuar pedido</button>
+    <p class="hint">Pago en efectivo al recoger en la papelería.</p>
+  </aside>
+
+  <dialog id="accountDialog">
+    <button class="close-button dialog-close" data-close="accountDialog">×</button>
+    <div id="accountContent"></div>
+  </dialog>
+
+  <dialog id="checkoutDialog">
+    <button class="close-button dialog-close" data-close="checkoutDialog">×</button>
+    <h2>Confirmar pedido</h2>
+    <p>Elige cuándo te gustaría recogerlo. El dueño recibirá el detalle por WhatsApp para confirmar contigo.</p>
+    <form id="checkoutForm">
+      <label>Nombre completo<input name="name" required maxlength="80" /></label>
+      <label>Teléfono para confirmar<input name="phone" type="tel" required maxlength="20" /></label>
+      <div class="form-row"><label>Fecha<input name="date" type="date" required /></label><label>Hora sugerida<input name="time" type="time" required /></label></div>
+      <label>Nota opcional<textarea name="notes" rows="3" placeholder="Ej. pasaré después de clases"></textarea></label>
+      <button class="primary-button full" type="submit">Enviar pedido por WhatsApp</button>
+    </form>
+  </dialog>
+
+  <dialog id="orderDialog">
+    <button class="close-button dialog-close" data-close="orderDialog">×</button>
+    <div id="orderContent"></div>
+  </dialog>
+  <div class="backdrop" id="backdrop"></div>
+  <script src="app.js"></script>
+</body>
+</html>
