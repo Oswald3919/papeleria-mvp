@@ -14,7 +14,6 @@
     <a class="brand" href="#inicio">Cybertime <span>• pedidos para recoger</span></a>
     <nav>
       <a href="#catalogo">Catálogo</a>
-      <button class="text-button" id="accountButton">Mi cuenta</button>
       <button class="cart-button" id="cartButton">Carrito <b id="cartCount">0</b></button>
     </nav>
   </header>
@@ -26,8 +25,6 @@
       <p>Compra en línea, paga en efectivo cuando pases por tu pedido y acumula puntos con cada compra.</p>
       <a class="primary-button" href="#catalogo">Ver productos</a>
     </section>
-
-    <section class="notice" id="userStatus">Inicia sesión para acumular puntos y consultar tus pedidos.</section>
 
     <section class="catalog-section" id="catalogo">
       <div class="section-heading">
@@ -63,19 +60,13 @@
     <p class="hint">Pago en efectivo al recoger en la papelería.</p>
   </aside>
 
-  <dialog id="accountDialog">
-    <button class="close-button dialog-close" data-close="accountDialog">×</button>
-    <div id="accountContent"></div>
-  </dialog>
-
   <dialog id="checkoutDialog">
     <button class="close-button dialog-close" data-close="checkoutDialog">×</button>
     <h2>Confirmar pedido</h2>
-    <p>Elige cuándo te gustaría recogerlo. El dueño recibirá el detalle por WhatsApp para confirmar contigo.</p>
+    <p>Te pediremos tus datos para enviarlos por WhatsApp y sumar puntos a tu número.</p>
     <form id="checkoutForm">
       <label>Nombre completo<input name="name" required maxlength="80" /></label>
-      <label>Teléfono para confirmar<input name="phone" type="tel" required maxlength="20" /></label>
-      <div class="form-row"><label>Fecha<input name="date" type="date" required /></label><label>Hora sugerida<input name="time" type="time" required /></label></div>
+      <label>Teléfono (para guardar tus puntos)<input name="phone" type="tel" required maxlength="20" /></label>
       <label>Nota opcional<textarea name="notes" rows="3" placeholder="Ej. pasaré después de clases"></textarea></label>
       <button class="primary-button full" type="submit">Enviar pedido por WhatsApp</button>
     </form>
