@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Montserrat:ital,wght@0,300..800;1,300..800&family=Source+Code+Pro:ital,wght@0,400..700;1,400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
 
 :root {
   --card: #f8f5f0;
@@ -16,11 +16,11 @@
   --popover: #f8f5f0;
   --primary: #2e7d32;
   --sidebar: #f0e9e0;
-  --font-mono: Source Code Pro, monospace;
-  --font-sans: Montserrat, sans-serif;
+  --font-mono: 'Space Grotesk', monospace;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --secondary: #e8f5e9;
   --background: #f8f5f0;
-  --font-serif: Merriweather, serif;
+  --font-serif: 'Space Grotesk', 'Inter', sans-serif;
   --foreground: #3e2723;
   --destructive: #c62828;
   --sidebar-ring: #2e7d32;
