@@ -3,7 +3,7 @@ const sampleProducts = [
   ['Bastidor Cartón con Tela 25 x 20',30,3,'Arte'],['Cuaderno Profesional Cosido Dibujo Swing',68,4,'Cuadernos'],['Pegamento Blanco 250g Fix-Up',28,1,'Adhesivos'],['Pintura Acrílica Violeta',14,0,'Arte'],['Pintura para Dedos Pelikan 150ml',30,1,'Arte'],['Lápiz Adhesivo',22,12,'Adhesivos'],['Pluma Gel Negra',18,20,'Escritura'],['Caja de Colores 12 piezas',52,8,'Colores'],['Cartulina Escolar Blanca',8,35,'Papel'],['Tijeras Escolares',35,10,'Herramientas']
 ].map((p,i)=>({id:`sample-${i}`,name:p[0],price:p[1],stock:p[2],category:p[3],image:''}));
 let state = JSON.parse(localStorage.getItem(STORE) || 'null') || {products:sampleProducts,cart:[],orders:[]};
-const WHATSAPP_NUMBER = '523340187767';
+const WHATSAPP_NUMBER = '523311133963';
 let selectedCategory='Todos', selectedSort='name';
 const $=s=>document.querySelector(s); const money=n=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(n);
 function save(){localStorage.setItem(STORE,JSON.stringify(state))}
@@ -23,19 +23,21 @@ function checkout(){if(!state.cart.length)return;$('#checkoutDialog').showModal(
 async function finishOrder(e){
   e.preventDefault();const f=new FormData(e.target), total=cartTotal();
   const phone = f.get('phone'), name = f.get('name'), notes = f.get('notes');
-  const earnedPoints = Math.floor(total/10);
-  let totalPoints = earnedPoints;
-  if(cloud){
-    const { data } = await cloud.from('customers').select('points').eq('phone', phone).maybeSingle();
-    totalPoints = (data?.points || 0) + earnedPoints;
-    await cloud.from('customers').upsert({ phone, name, points: totalPoints });
-  }
   const order={id:`PED-${Date.now().toString().slice(-6)}`,name,phone,notes,items:state.cart.map(x=>({...x,product:state.products.find(p=>p.id===x.id)})),total};
   state.orders.unshift(order);
   state.cart=[];save();closeAll();render();
   const details=order.items.map(i=>`• ${i.qty} x ${i.product.name} (${money(i.product.price*i.qty)})`).join('\n');
-  const message=`Hola, tengo un pedido para recoger en la papelería.%0A%0A*${order.id}*%0ACliente: ${order.name}%0ATeléfono: ${order.phone}%0A%0A${details}%0A%0A*Total: ${money(total)}*%0APago en efectivo al recoger.${order.notes?`%0ANota: ${order.notes}`:''}%0A%0ASumé ${earnedPoints} puntos con este pedido y llevo ${totalPoints} puntos.`;
-  $('#orderContent').innerHTML=`<h2>Pedido registrado</h2><p>Acumulaste <strong>${earnedPoints} puntos</strong> y ahora tienes <strong>${totalPoints}</strong>. Abre WhatsApp para enviar el pedido y acordar la hora de recogida.</p><a class="primary-button full" target="_blank" rel="noopener" href="https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}">Abrir WhatsApp</a><p class="hint">Pedido ${order.id} · ${money(total)}</p>`;
+  const message=`Hola, tengo un pedido para recoger en la papelería.
+
+*${order.id}*
+Cliente: ${order.name}
+Teléfono: ${order.phone}
+
+${details}
+
+*Total: ${money(total)}*
+Pago en efectivo al recoger.${order.notes ? `\nNota: ${order.notes}` : ''}`;
+  $('#orderContent').innerHTML=`<h2>Pedido registrado</h2><p>Abre WhatsApp para enviar el pedido y acordar la hora de recogida.</p><a class="primary-button full" target="_blank" rel="noopener" href="https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}">Abrir WhatsApp</a><p class="hint">Pedido ${order.id} · ${money(total)}</p>`;
   $('#orderDialog').showModal()
 }
 function parseCsv(text){const out=[];let row=[],cell='',quoted=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c==='"'&&quoted&&n==='"'){cell+='"';i++}else if(c==='"')quoted=!quoted;else if(c===','&&!quoted){row.push(cell);cell=''}else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&n==='\n')i++;row.push(cell);if(row.some(x=>x.trim()))out.push(row);row=[];cell=''}else cell+=c}if(cell||row.length){row.push(cell);out.push(row)}const headers=out.shift().map(h=>h.replace(/^\uFEFF/,'').trim());return out.map(r=>Object.fromEntries(headers.map((h,i)=>[h,(r[i]||'').trim()])))}
